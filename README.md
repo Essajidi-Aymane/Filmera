@@ -1,16 +1,61 @@
-# filmera
 
-A new Flutter project.
+# Filmera
 
-## Getting Started
+Filmera est une application Flutter permettant de rechercher, découvrir et sauvegarder vos films et séries favoris grâce à l'API The Movie Database (TMDb).
 
-This project is a starting point for a Flutter application.
+## Description
 
-A few resources to get you started if this is your first Flutter project:
+- **Recherche** de films et séries par titre.
+- **Découverte** des tendances du moment.
+- **Ajout/Suppression** de favoris.
+- **Page de détails** pour chaque film/série.
+- **Gestion des favoris** avec une page dédiée.
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## Lancer l'application
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+1. **Prérequis** :
+	- Flutter SDK (>=3.9.2)
+	- Un compte TMDb pour obtenir une clé API
+
+2. **Cloner le projet** :
+	```bash
+	git clone <url-du-repo>
+	cd filmera
+	```
+
+3. **Configurer l'API Key** :
+	- Crée un fichier `.env` à la racine du projet (déjà présent normalement)
+	- Ajoute ta clé TMDb :
+	  ```env
+	  TMDB_API_KEY=VOTRE_CLE_API
+	  ```
+
+4. **Installer les dépendances** :
+	```bash
+	flutter pub get
+	```
+
+5. **Lancer l'application** :
+	```bash
+	flutter run
+	```
+
+## Librairies utilisées
+
+- [flutter_bloc](https://pub.dev/packages/flutter_bloc) : gestion d'état
+- [equatable](https://pub.dev/packages/equatable) : comparaison d'objets
+- [http](https://pub.dev/packages/http) : requêtes HTTP
+- [cached_network_image](https://pub.dev/packages/cached_network_image) : affichage et cache des images
+- [flutter_dotenv](https://pub.dev/packages/flutter_dotenv) : gestion des variables d'environnement
+- [url_launcher](https://pub.dev/packages/url_launcher) : ouverture de liens externes
+
+## API utilisée
+
+- [The Movie Database (TMDb)](https://www.themoviedb.org/documentation/api) : pour récupérer les films, séries, images et détails.
+
+## Auteur
+- Projet réalisé par Aymane Essajidi
+
+---
+
+

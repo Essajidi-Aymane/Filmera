@@ -11,6 +11,8 @@ import 'details_screen.dart';
 import '../cubits/details_cubit.dart';
 import '../repositories/media_repository.dart';
 
+import 'favorites_screen.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -20,7 +22,38 @@ class HomeScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('ShowFind'),
+  elevation: 0,
+  backgroundColor: Colors.transparent,
+  flexibleSpace: Container(
+    decoration: const BoxDecoration(
+      gradient: LinearGradient(
+        colors: [Color(0xFF232526), Color(0xFF414345)],
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+      ),
+    ),
+  ),
+  title: Row(
+    children: [
+      Icon(Icons.movie, color: Colors.amber),
+      const SizedBox(width: 8),
+      Text('Filmera', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
+    ],
+  ),
+  shape: const RoundedRectangleBorder(
+    borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+  ),
+  actions: [
+          IconButton(
+            icon: const Icon(Icons.favorite),
+            tooltip: 'Mes Favoris',
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const FavoritesScreen()),
+              );
+            },
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -40,12 +73,12 @@ class HomeScreen extends StatelessWidget {
             child: BlocBuilder<SearchCubit, DiscoverState>(
               builder: (context, searchState) {
                 // si pas de recherche → suggestions
-                if (searchState is DiscoverLoaded && searchState.items.isEmpty) {
+                if (searchState is DiscoverLoaded &&
+                    searchState.items.isEmpty) {
                   return BlocBuilder<DiscoverCubit, DiscoverState>(
                     builder: (context, discoverState) {
                       if (discoverState is DiscoverLoading) {
-                        return const Center(
-                            child: CircularProgressIndicator());
+                        return const Center(child: CircularProgressIndicator());
                       } else if (discoverState is DiscoverLoaded) {
                         return _MediaGrid(items: discoverState.items);
                       } else if (discoverState is DiscoverError) {
@@ -95,50 +128,82 @@ class _MediaGrid extends StatelessWidget {
       itemCount: items.length,
       itemBuilder: (context, index) {
         final item = items[index];
-        final isFav = favorites
-            .any((e) => e.id == item.id && e.isMovie == item.isMovie);
+        final isFav = favorites.any(
+          (e) => e.id == item.id && e.isMovie == item.isMovie,
+        );
 
-        return GestureDetector(
-          onTap: () {
-            final repo = context.read<MediaRepository>();
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (_) => BlocProvider(
-                  create: (_) =>
-                      DetailsCubit(repo: repo)..loadDetails(item),
-                  child: DetailsScreen(item: item),
+        return Card(
+          elevation: 4,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          clipBehavior: Clip.antiAlias,
+          child: InkWell(
+            onTap: () {
+              final repo = context.read<MediaRepository>();
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (_) => BlocProvider(
+                    create: (_) => DetailsCubit(repo: repo)..loadDetails(item),
+                    child: DetailsScreen(item: item),
+                  ),
                 ),
-              ),
-            );
-          },
-          child: Column(
-            children: [
-              Expanded(
-                child: item.posterUrl != null
-                    ? CachedNetworkImage(imageUrl: item.posterUrl!)
-                    : const ColoredBox(color: Colors.grey),
-              ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      item.title,
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
+              );
+            },
+            child: Column(
+              children: [
+                Expanded(
+                  child: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [Color(0xFF232526), Color(0xFF414345)],
+                          ),
+                        ),
+                      ),
+                      if (item.posterUrl != null)
+                        CachedNetworkImage(
+                          imageUrl: item.posterUrl!,
+                          fit: BoxFit.cover,
+                        )
+                      else
+                        const ColoredBox(color: Colors.grey),
+                    ],
                   ),
-                  IconButton(
-                    icon: Icon(
-                      isFav ? Icons.favorite : Icons.favorite_border,
-                      color: isFav ? Colors.red : Colors.white,
-                    ),
-                    onPressed: () {
-                      context.read<FavoritesCubit>().toggleFavorite(item);
-                    },
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 4,
+                    vertical: 2,
                   ),
-                ],
-              ),
-            ],
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.title,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                      ),
+                      IconButton(
+                        icon: Icon(
+                          isFav ? Icons.favorite : Icons.favorite_border,
+                          color: isFav ? Colors.red : Colors.white,
+                        ),
+                        onPressed: () {
+                          context.read<FavoritesCubit>().toggleFavorite(item);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         );
       },
