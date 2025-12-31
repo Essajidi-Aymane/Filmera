@@ -19,31 +19,38 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final searchCubit = context.read<SearchCubit>();
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final height = size.height;
+    final orientation = MediaQuery.of(context).orientation;
 
     return Scaffold(
       appBar: AppBar(
-  elevation: 0,
-  backgroundColor: Colors.transparent,
-  flexibleSpace: Container(
-    decoration: const BoxDecoration(
-      gradient: LinearGradient(
-        colors: [Color(0xFF232526), Color(0xFF414345)],
-        begin: Alignment.topLeft,
-        end: Alignment.bottomRight,
-      ),
-    ),
-  ),
-  title: Row(
-    children: [
-      Icon(Icons.movie, color: Colors.amber),
-      const SizedBox(width: 8),
-      Text('Filmera', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22)),
-    ],
-  ),
-  shape: const RoundedRectangleBorder(
-    borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
-  ),
-  actions: [
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Color(0xFF232526), Color(0xFF414345)],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+        ),
+        title: Row(
+          children: [
+            Icon(Icons.movie, color: Colors.amber),
+            const SizedBox(width: 8),
+            Text(
+              'Filmera',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+            ),
+          ],
+        ),
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+        ),
+        actions: [
           IconButton(
             icon: const Icon(Icons.favorite),
             tooltip: 'Mes Favoris',
@@ -116,14 +123,29 @@ class _MediaGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final favorites = context.watch<FavoritesCubit>().state;
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final orientation = MediaQuery.of(context).orientation;
+
+    // Responsive: nombre de colonnes selon la largeur ou l'orientation
+    int crossAxisCount = 2;
+    if (width > 900) {
+      crossAxisCount = 5;
+    } else if (width > 600) {
+      crossAxisCount = 4;
+    } else if (orientation == Orientation.landscape) {
+      crossAxisCount = 3;
+    } else {
+      crossAxisCount = 2;
+    }
 
     return GridView.builder(
-      padding: const EdgeInsets.all(8),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
+      padding: EdgeInsets.all(width * 0.02),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
         childAspectRatio: 0.6,
-        crossAxisSpacing: 8,
-        mainAxisSpacing: 8,
+        crossAxisSpacing: width * 0.02,
+        mainAxisSpacing: width * 0.02,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {

@@ -15,6 +15,10 @@ class DetailsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final orientation = MediaQuery.of(context).orientation;
+
     return Scaffold(
       appBar: AppBar(title: Text(item.title)),
       body: BlocBuilder<DetailsCubit, DetailsState>(
@@ -31,45 +35,66 @@ class DetailsScreen extends StatelessWidget {
                 : 'https://www.themoviedb.org/tv/${media.id}';
 
             return SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (media.posterUrl != null)
-                    CachedNetworkImage(imageUrl: media.posterUrl!),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(media.overview),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Text(
-                      'Note TMDb : ${media.voteAverage.toStringAsFixed(1)}',
-                    ),
-                  ),
-                  Row(
-                    children: [
-                      IconButton(
-                        icon: Icon(
-                            isFav ? Icons.favorite : Icons.favorite_border),
-                        onPressed: () =>
-                            context.read<FavoritesCubit>().toggleFavorite(media),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: width * 0.05),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (media.posterUrl != null)
+                      Container(
+                        width: orientation == Orientation.portrait
+                            ? width * 0.6
+                            : width * 0.3,
+                        height: orientation == Orientation.portrait
+                            ? width * 0.9
+                            : width * 0.5,
+                        margin: EdgeInsets.symmetric(vertical: width * 0.04),
+                        child: CachedNetworkImage(
+                          imageUrl: media.posterUrl!,
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                      const Text('Ajouter aux favoris'),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  ListTile(
-                    title: const Text('Page TMDb'),
-                    subtitle: Text(tmdbUrl),
-                    onTap: () async {
-                      final uri = Uri.parse(tmdbUrl);
-                      if (await canLaunchUrl(uri)) {
-                        await launchUrl(uri);
-                      }
-                    },
-                  ),
-                  // plus tard : liens “où regarder” via une 2e API
-                ],
+                    Padding(
+                      padding: EdgeInsets.all(width * 0.02),
+                      child: Text(
+                        media.overview,
+                        style: TextStyle(fontSize: width * 0.045),
+                      ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.all(width * 0.02),
+                      child: Text(
+                        'Note TMDb : ${media.voteAverage.toStringAsFixed(1)}',
+                        style: TextStyle(fontSize: width * 0.04),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: Icon(
+                            isFav ? Icons.favorite : Icons.favorite_border,
+                          ),
+                          onPressed: () => context
+                              .read<FavoritesCubit>()
+                              .toggleFavorite(media),
+                        ),
+                        const Text('Ajouter aux favoris'),
+                      ],
+                    ),
+                    SizedBox(height: width * 0.04),
+                    ListTile(
+                      title: const Text('Page TMDb'),
+                      subtitle: Text(tmdbUrl),
+                      onTap: () async {
+                        final uri = Uri.parse(tmdbUrl);
+                        if (await canLaunchUrl(uri)) {
+                          await launchUrl(uri);
+                        }
+                      },
+                    ),
+                    // plus tard : liens “où regarder” via une 2e API
+                  ],
+                ),
               ),
             );
           } else if (state is DetailsError) {

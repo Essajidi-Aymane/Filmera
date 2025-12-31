@@ -15,18 +15,32 @@ class FavoritesScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final favorites = context.watch<FavoritesCubit>().state;
     final repo = context.read<MediaRepository>();
+    final size = MediaQuery.of(context).size;
+    final width = size.width;
+    final orientation = MediaQuery.of(context).orientation;
+
+    int crossAxisCount = 2;
+    if (width > 900) {
+      crossAxisCount = 5;
+    } else if (width > 600) {
+      crossAxisCount = 4;
+    } else if (orientation == Orientation.landscape) {
+      crossAxisCount = 3;
+    } else {
+      crossAxisCount = 2;
+    }
 
     return Scaffold(
       appBar: AppBar(title: const Text('Mes Favoris')),
       body: favorites.isEmpty
           ? const Center(child: Text('Aucun favori pour le moment.'))
           : GridView.builder(
-              padding: const EdgeInsets.all(8),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
+              padding: EdgeInsets.all(width * 0.02),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: crossAxisCount,
                 childAspectRatio: 0.6,
-                crossAxisSpacing: 8,
-                mainAxisSpacing: 8,
+                crossAxisSpacing: width * 0.02,
+                mainAxisSpacing: width * 0.02,
               ),
               itemCount: favorites.length,
               itemBuilder: (context, index) {
